@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Next.js
+.next/
+out/
+
+# Env & secrets (never commit API keys)
+.env
+.env.local
+.env.*.local
+*.env
+
+# Docs (internal / generated)
+docs/
+
+# Build & cache
+*.tsbuildinfo
+.turbo/
+
+# IDE & OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Logs & debug
+*.log
+.cursor/debug.log
+
+# Optional: large generated index (uncomment if you don't want to commit fatwa_index.json)
+# data/fatwa_index.json
+# data/fatwa_memory.mv2
+# data/*.wal
