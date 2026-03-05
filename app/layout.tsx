@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Fatwa Agent — Su'aalaha Ramadaanka",
+  title: "Fatwa Agent — Jawaabaha culimada",
   description:
-    "Nidaam AI ah oo ka jawaaba su'aalaha Fiqhiga Ramadaanka, ku salaysan xogta culimada Soomaaliyeed.",
+    "Nidaam AI ah oo ka jawaaba su'aalaha Fiqhiga Ramadaanka, ku salaysan jawaabaha culimada Soomaaliyeed.",
   icons: { icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☽</text></svg>" },
 };
 

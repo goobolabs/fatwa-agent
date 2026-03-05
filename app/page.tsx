@@ -5,12 +5,12 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 const EXAMPLES = [
-  { q: "Injekshinku soonka ma jabiyaa?", icon: "💉", label: "Caafimaadka" },
-  { q: "Qofku hadduu biyo ku galo afkiisa si aan ula kasdamin soonkiisa ma jabtaa?", icon: "💧", label: "Biyaha" },
-  { q: "Dumarka ma isticmaali karaan kaniini si ay u soomaan?", icon: "💊", label: "Daawada" },
-  { q: "Qofka bukaan ah ee Ramadaanka soomin kari waaya maxuu yeelayaa?", icon: "🏥", label: "Bukaanka" },
-  { q: "Taraweexda Ramadaanka ma waajib baa mise sunno?", icon: "🕌", label: "Salaadda" },
-  { q: "Sigaarka cabidda soonka ma jabisaa?", icon: "🚬", label: "Sigaarka" },
+  { q: "Dabaashu soonka ma jabisaa?", icon: "🌙", label: "Soon" },
+  { q: "xaakadu soonka ma jabisaa?", icon: "🌙", label: "Soon" },
+  { q: "Dumarka ma isticmaali karaan kaniini caadada ka joojiya si ay u soomaan?", icon: "🌙", label: "Soon" },
+  { q: "Qofka bukaanka ah ee Ramadaanka soomin kari waaya maxuu yeelayaa?", icon: "🌙", label: "Soon" },
+  { q: "Qof sooman dhiig ma iska qaadi karaa?", icon: "🌙", label: "Soon" },
+  { q: "Fidyada lacag ahaan ma u siin karaa qofka?", icon: "🌙", label: "Soon" },
 ];
 
 const FEATURES = [
@@ -22,28 +22,29 @@ const FEATURES = [
   },
   {
     icon: "📚",
-    title: "138 Fatwa Kaydsan",
+    title: "Hadda waxaa ku kaydsan Su'aalaha Soonka ",
     desc: "Xogta waxaa laga soo qaaday culimada Soomaaliyeed oo la xaqiijiyay — Sh. Dirir, Sh. Umal, iyo qaar kale.",
     color: "var(--primary)",
   },
-  {
-    icon: "⚖️",
-    title: "Jawaab Qaab-dhismeed leh",
-    desc: "Jawaab kasta waxay ku dhisantahay: Xukunka, Faahfaahin, Ikhtilaaf, Gunaanad, iyo Tixraac.",
-    color: "var(--secondary)",
-  },
+  // {
+  //   icon: "⚖️",
+  //   title: "Jawaab Qaab-dhismeed leh",
+  //   desc: "Jawaab kasta waxay ku dhisantahay: Xukunka, Faahfaahin, Ikhtilaaf, Gunaanad, iyo Tixraac.",
+  //   color: "var(--secondary)",
+  // },
   {
     icon: "🛡️",
-    title: "Ammaansan & Dhexdhexaad",
-    desc: "Haddaan xog la helin, wuu diidayaa in uu ka jawaabo. Ma doorbido madhab gaar ah.",
+    title: "Amaan & Dhexdhexaad ah",
+    desc: "Haddii uusan jawaabaha culimada helin, jawaab cusub ma alifyo",
     color: "var(--primary)",
   },
 ];
 
 const SCHOLARS = [
   { name: "Sh. Maxamed Cumar Dirir", count: "90+" },
-  { name: "Sh. Maxamed Cabdi Umal", count: "30+" },
-  { name: "Culimo kale", count: "15+" },
+  { name: "Sh. Maxamuud Shibli", count: "30+" },
+  { name: "Dr Khadar Xasan Axmed", count: "18+" },
+  { name: "Culimada kale", count: "20+" },
 ];
 
 function Particle({ delay, x, size, color }: { delay: number; x: number; size: number; color: string }) {
@@ -102,7 +103,7 @@ export default function LandingPage() {
           </div>
 
           <div className="animate-fade-up" style={{ animationDelay: "0.25s" }}>
-            <p className="text-xs font-semibold tracking-[0.3em] uppercase text-[var(--secondary-bright)] mb-4">Ramadan Fiqh AI Agent</p>
+            <p className="text-xs font-semibold tracking-[0.3em] uppercase text-[var(--secondary-bright)] mb-4">Somali Fatwa AI Agent</p>
           </div>
 
           <h1 className="animate-fade-up text-5xl md:text-6xl font-black tracking-tight mb-6 text-balance" style={{ animationDelay: "0.35s", fontFamily: "'Playfair Display', serif" }}>
@@ -111,12 +112,12 @@ export default function LandingPage() {
           </h1>
 
           <p className="animate-fade-up text-base md:text-lg text-[var(--text-secondary)] max-w-xl mx-auto leading-relaxed mb-3 text-balance" style={{ animationDelay: "0.45s" }}>
-            Nidaam AI ah oo ku salaysan xogta culimada Soomaaliyeed. Weydii su&apos;aashaada — hel jawaab daliil ku salaysan.
+            Nidaam AI ah oo ku salaysan jawaabaha culimada Soomaaliyeed. Weydii su&apos;aashaada — hel jawaab daliil ku salaysan.
           </p>
 
           <div className="animate-fade-up flex items-center justify-center gap-2 text-xs text-[var(--text-muted)] mb-10" style={{ animationDelay: "0.55s" }}>
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--green)] animate-pulse" />
-            Nidaamku waa shaqaynayaa — 138 fatwa diyaar ah
+            Nidaamka hadda waxaad ka heli kartaa su'aalaha Ramadaanta kaliya
           </div>
 
           {/* CTA */}
@@ -125,7 +126,7 @@ export default function LandingPage() {
               href="/chat"
               className="group relative inline-flex items-center justify-center gap-3 px-10 py-4 rounded-2xl text-base font-bold transition-all duration-300 hover:scale-[1.03] gradient-primary text-white glow-primary-strong"
             >
-              <span>Bilow Weydiista</span>
+              <span>Hadda waydii</span>
               <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </Link>
             <a
@@ -286,7 +287,7 @@ export default function LandingPage() {
             className="mx-auto mb-8 drop-shadow-[0_0_20px_rgba(255,163,53,0.2)]"
           />
           <h2 className="text-3xl font-bold gradient-text mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>Diyaar ma tahay?</h2>
-          <p className="text-sm text-[var(--text-muted)] mb-8">Bilow wadahadal su&apos;aalaha Fiqhiga Ramadaanka oo hel jawaab daliil ku salaysan.</p>
+          <p className="text-sm text-[var(--text-muted)] mb-8">Bilow waydiinta su&apos;aalaha Ramadaanta oo hel jawaabaha culimada.</p>
           <Link
             href="/chat"
             className="group inline-flex items-center gap-3 px-10 py-4 rounded-2xl text-base font-bold transition-all duration-300 hover:scale-[1.03] gradient-primary text-white glow-primary-strong"

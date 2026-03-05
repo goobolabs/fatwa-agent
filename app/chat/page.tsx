@@ -25,9 +25,9 @@ function now() {
 }
 
 const QUICK = [
-  "Injekshinku soonka ma jabiyaa?",
-  "Taraweexda ma waajib baa?",
-  "Sigaarka cabidda soonka ma jabisaa?",
+  "Liqidda xaakadu soonka ma jabisaa?",
+  "Qof sooman dhiig ma iska qaadi karaa?",
+  "Hadii aan dhunkado xaaskayga soonku ma iga burayaa?",
 ];
 
 /** Extract YouTube video ID from youtu.be/... or youtube.com/watch?v=... */
@@ -150,7 +150,7 @@ function FatwaCard({ fatwa }: { fatwa: FatwaBlock }) {
   const sections = [
     { key: "xukun",      icon: "xukun" as const,      title: "Xukunka",     color: "var(--primary)",        bg: "rgba(255,163,53,0.07)" },
     { key: "faahfaahin", icon: "faahfaahin" as const, title: "Faahfaahin",  color: "var(--secondary)",      bg: "rgba(29,110,199,0.07)" },
-    { key: "ikhtilaf",   icon: "ikhtilaf" as const,   title: "Ikhtilaaf",   color: "var(--green)",          bg: "rgba(16,185,129,0.06)" },
+    // { key: "ikhtilaf",   icon: "ikhtilaf" as const,   title: "Ikhtilaaf",   color: "var(--green)",          bg: "rgba(16,185,129,0.06)" },
     { key: "gunaanad",   icon: "gunaanad" as const,   title: "Gunaanad",    color: "var(--primary-bright)", bg: "rgba(255,184,92,0.06)" },
   ] as const;
 
@@ -363,7 +363,7 @@ function ChatInner() {
                   className="mb-8 animate-float drop-shadow-[0_0_25px_rgba(255,163,53,0.2)]"
                 />
                 <h2 className="text-xl font-bold text-[var(--text)] mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>Assalaamu Calaykum</h2>
-                <p className="text-sm text-[var(--text-muted)] mb-8 max-w-sm">Waxaan ahay Fatwa Agent — su&apos;aashaada Fiqhiga Ramadaanka ii weydii.</p>
+                <p className="text-sm text-[var(--text-muted)] mb-8 max-w-sm">Waxaan ahay Fatwa Agent — su&apos;aashaada ku saabsan Axkaamta Soonka ii weydii.</p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-lg">
                   {QUICK.map((q, i) => (
@@ -415,7 +415,7 @@ function ChatInner() {
                 </div>
                 <div className="glass rounded-2xl rounded-bl-md px-5 py-4">
                   <div className="flex items-center gap-2">
-                    <p className="text-[12px] text-[var(--text-muted)] mr-2">Waan ka fiirsanayaa</p>
+                    <p className="text-[12px] text-[var(--text-muted)] mr-2">Waan raadinayaa jawaabta</p>
                     <span className="w-2 h-2 rounded-full bg-[var(--primary)] dot-1" />
                     <span className="w-2 h-2 rounded-full bg-[var(--secondary)] dot-2" />
                     <span className="w-2 h-2 rounded-full bg-[var(--primary)] dot-3" />
