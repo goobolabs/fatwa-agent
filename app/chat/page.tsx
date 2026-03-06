@@ -210,7 +210,7 @@ function ChatInner() {
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [sideOpen, setSideOpen] = useState(true);
+  const [sideOpen, setSideOpen] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const autoSent = useRef(false);
@@ -254,6 +254,16 @@ function ChatInner() {
       send(q);
     }
   }, [params, send]);
+
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 1024px)");
+    const applySidebarMode = () => setSideOpen(media.matches);
+
+    applySidebarMode();
+    media.addEventListener("change", applySidebarMode);
+
+    return () => media.removeEventListener("change", applySidebarMode);
+  }, []);
 
   useEffect(() => { inputRef.current?.focus(); }, [loading]);
 
