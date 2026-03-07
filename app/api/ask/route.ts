@@ -18,6 +18,51 @@ import { buildPrompt } from "@/lib/ai/prompt";
 import { formatFatwaResponse } from "@/lib/ai/formatter";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+function extractFirstUrl(text: string): string | null {
+  const match = text.match(/https?:\/\/[^\s)]+/i);
+  return match ? match[0] : null;
+}
+
+function normalizeRefLine(line: string): string {
+  return line
+    .replace(/^\s*[•\-\*]\s*/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function buildEvidenceReferences(
+  evidence: { sheikh: string; source_url: string }[]
+): string[] {
+  const refs: string[] = [];
+  const seenUrls = new Set<string>();
+
+  for (const e of evidence) {
+    const url = extractFirstUrl(e.source_url ?? "");
+    if (!url || seenUrls.has(url)) continue;
+    seenUrls.add(url);
+    const label = e.sheikh?.trim() ? `Sheekh: ${e.sheikh.trim()}` : "Tixraac";
+    refs.push(`${label} - ${url}`);
+  }
+
+  return refs;
+}
+
+function mergeReferences(modelRefs: string[], evidenceRefs: string[]): string[] {
+  const merged: string[] = [];
+  const seenUrls = new Set<string>();
+
+  for (const line of [...modelRefs, ...evidenceRefs]) {
+    const cleaned = normalizeRefLine(line);
+    if (!cleaned) continue;
+    const url = extractFirstUrl(cleaned);
+    if (!url || seenUrls.has(url)) continue;
+    seenUrls.add(url);
+    merged.push(cleaned);
+  }
+
+  return merged;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -98,9 +143,11 @@ export async function POST(req: NextRequest) {
     // Step 6: Format and return
     const formatted = formatFatwaResponse(rawText);
 
-    const tixraacList = formatted.tixraac
+    const modelTixraacList = formatted.tixraac
       ? formatted.tixraac.split("\n").map((t) => t.trim()).filter(Boolean)
       : [];
+    const evidenceTixraacList = buildEvidenceReferences(evidence);
+    const tixraacList = mergeReferences(modelTixraacList, evidenceTixraacList);
 
     return NextResponse.json({
       success: true,

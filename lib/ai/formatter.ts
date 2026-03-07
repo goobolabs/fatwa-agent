@@ -14,7 +14,7 @@ export interface FatwaResponse {
 
 function extractSection(text: string, heading: string): string {
   const regex = new RegExp(
-    `\\*{0,2}${heading}\\*{0,2}[:\\s]*([\\s\\S]*?)(?=\\n\\*{0,2}(?:Xukunka|Faahfaahin|Ikhtilaaf|Gunaanad|Tixraac)\\*{0,2}[:\\s]|$)`,
+    `\\*{0,2}${heading}\\*{0,2}[:\\s]*([\\s\\S]*?)(?=\\n\\*{0,2}(?:Xukunka|Faahfaahin|Ikhtilaaf|Gunaanad|Tixraac(?:yada)?)\\*{0,2}[:\\s]|$)`,
     "i"
   );
   const match = text.match(regex);
@@ -32,7 +32,7 @@ export function formatFatwaResponse(rawText: string): FatwaResponse {
     faahfaahin: extractSection(rawText, "Faahfaahin"),
     ikhtilaaf: extractSection(rawText, "Ikhtilaaf"),
     gunaanad: extractSection(rawText, "Gunaanad"),
-    tixraac: extractSection(rawText, "Tixraac"),
+    tixraac: extractSection(rawText, "Tixraac(?:yada)?"),
     raw: rawText,
   };
 }

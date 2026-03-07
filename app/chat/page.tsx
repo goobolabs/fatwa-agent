@@ -25,9 +25,13 @@ function now() {
 }
 
 const QUICK = [
-  "Liqidda xaakadu soonka ma jabisaa?",
+
   "Qof sooman dhiig ma iska qaadi karaa?",
-  "Hadii aan dhunkado xaaskayga soonku ma iga burayaa?",
+  "Fidyada meel kale qof jira ma u diri karaa?",
+  "Waxyaabaha madaxa looga duro dadka timuhu kaa daataan sida PRP-da soonka wax ma yeelayaan?",
+  "Liqidda xaakadu soonka ma jabisaa?",
+  "qofka ictikaafka ku jira cunto iwm banaanka ma u doonan kara?",
+  
 ];
 
 /** Extract YouTube video ID from youtu.be/... or youtube.com/watch?v=... */
@@ -39,24 +43,51 @@ function getYouTubeId(url: string): string | null {
   return null;
 }
 
+function parseTimeToSeconds(time: string): number | null {
+  const trimmed = time.trim();
+  if (!trimmed) return null;
+  if (/^\d+$/.test(trimmed)) return Number.parseInt(trimmed, 10);
+
+  const match = trimmed.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/i);
+  if (!match) return null;
+  const hours = Number.parseInt(match[1] ?? "0", 10);
+  const minutes = Number.parseInt(match[2] ?? "0", 10);
+  const seconds = Number.parseInt(match[3] ?? "0", 10);
+  const total = hours * 3600 + minutes * 60 + seconds;
+  return total > 0 ? total : null;
+}
+
+function getYouTubeStartSeconds(url: string): number | null {
+  try {
+    const parsed = new URL(url);
+    const value = parsed.searchParams.get("t") ?? parsed.searchParams.get("start");
+    if (!value) return null;
+    return parseTimeToSeconds(value);
+  } catch {
+    return null;
+  }
+}
+
 /** Parse tixraac string — could be "Sheikh name - url" or just a url */
-function parseTixraac(raw: string): { label: string; url: string | null; youtubeId: string | null } {
+function parseTixraac(raw: string): { label: string; url: string | null; youtubeId: string | null; startSeconds: number | null } {
   const urlMatch = raw.match(/(https?:\/\/[^\s]+)/);
   const url = urlMatch ? urlMatch[1] : null;
   const label = raw.replace(urlMatch?.[0] ?? "", "").replace(/[-–—|]+$/, "").trim() || "Tixraac";
   const youtubeId = url ? getYouTubeId(url) : null;
-  return { label, url, youtubeId };
+  const startSeconds = url ? getYouTubeStartSeconds(url) : null;
+  return { label, url, youtubeId, startSeconds };
 }
 
-function YouTubeCard({ label, url, videoId }: { label: string; url: string; videoId: string }) {
+function YouTubeCard({ label, url, videoId, startSeconds }: { label: string; url: string; videoId: string; startSeconds: number | null }) {
   const [showEmbed, setShowEmbed] = useState(false);
   const thumb = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+  const embedSrc = `https://www.youtube.com/embed/${videoId}?autoplay=1${startSeconds ? `&start=${startSeconds}` : ""}`;
 
   return (
     <div className="rounded-xl overflow-hidden" style={{ border: "1px solid var(--border-secondary)" }}>
       {showEmbed ? (
         <iframe
-          src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+          src={embedSrc}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
           className="w-full"
@@ -184,7 +215,7 @@ function FatwaCard({ fatwa }: { fatwa: FatwaBlock }) {
           </div>
           {tixraacParsed.map((t, i) =>
             t.youtubeId && t.url ? (
-              <YouTubeCard key={i} label={t.label} url={t.url} videoId={t.youtubeId} />
+              <YouTubeCard key={i} label={t.label} url={t.url} videoId={t.youtubeId} startSeconds={t.startSeconds} />
             ) : t.url ? (
               <a key={i} href={t.url} target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all duration-200 glass glass-secondary"
