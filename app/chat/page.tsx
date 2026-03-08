@@ -633,8 +633,14 @@ function ChatInner() {
                     height={50}
                     className="mx-auto mb-3 sm:mb-8 animate-float drop-shadow-[0_0_25px_rgba(255,163,53,0.2)]"
                   />
-                  <h2 className="text-xl font-bold text-[var(--text)] mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>Assalaamu Calaykum</h2>
-                  <p className="text-sm text-[var(--text-muted)] max-w-sm">Waxaan ahay Fatwa Agent — su&apos;aashaada ku saabsan Axkaamta Soonka ii weydii.</p>
+                  <div className="w-full max-w-sm mx-auto text-center sm:text-left">
+                    <h2 className="text-xl font-bold text-[var(--text)] mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>
+                      Assalaamu Calaykum
+                    </h2>
+                    <p className="text-sm text-[var(--text-muted)]">
+                      Waxaan ahay Fatwa Agent — su&apos;aashaada ku saabsan Axkaamta Soonka ii weydii.
+                    </p>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-lg mt-5 sm:mt-10 pb-2 sm:pb-0">
