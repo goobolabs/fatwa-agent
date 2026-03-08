@@ -483,6 +483,7 @@ function ChatInner() {
   const resolvedTheme: Exclude<ChatTheme, "system"> =
     theme === "system" ? (systemPrefersDark ? "dark" : "light") : theme;
   const chatThemeVars = CHAT_THEME_VARS[resolvedTheme] as Record<string, string>;
+  const logoSrc = resolvedTheme === "light" ? "/assets/logo-color.png" : "/assets/logo-white.png";
 
   const topBarBg = resolvedTheme === "dark" ? "rgba(5,8,15,0.85)" : "rgba(255,255,255,0.9)";
   const inputBarBg = resolvedTheme === "dark" ? "rgba(5,8,15,0.9)" : "rgba(255,255,255,0.92)";
@@ -517,7 +518,7 @@ function ChatInner() {
           <div className="p-5 border-b border-[var(--border)]">
             <Link href="/" className="flex items-center gap-3 group">
               <Image
-                src="/assets/logo-white.png"
+                src={logoSrc}
                 alt="Fatwa Agent"
                 width={110}
                 height={30}
@@ -624,7 +625,7 @@ function ChatInner() {
             {msgs.length === 0 && !loading && (
               <div className="flex flex-col items-center justify-center min-h-[50vh] text-center animate-fade-in">
                 <Image
-                  src="/assets/logo-white.png"
+                  src={logoSrc}
                   alt="Fatwa Agent"
                   width={180}
                   height={50}
