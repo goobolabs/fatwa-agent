@@ -624,7 +624,7 @@ function ChatInner() {
         <div className={`${isEmptyState ? "flex-none sm:flex-1" : "flex-1"} overflow-y-auto`}>
           <div className={`max-w-3xl mx-auto px-4 sm:px-5 py-4 sm:py-6 ${isEmptyState ? "" : "h-full"}`}>
             {isEmptyState && (
-              <div className="flex flex-col items-center text-center animate-fade-in pt-1 sm:pt-8 sm:min-h-[50vh] sm:justify-center">
+              <div className="flex flex-col items-center text-center animate-fade-in pt-5 sm:pt-8 sm:min-h-[50vh] sm:justify-center">
                 <div className="w-full">
                   <Image
                     src={logoSrc}
@@ -712,7 +712,10 @@ function ChatInner() {
         </div>
 
         {/* Input bar */}
-        <div className="flex-shrink-0 border-t border-[var(--border)] px-5 py-4" style={{ background: inputBarBg, backdropFilter: "blur(16px)" }}>
+        <div
+          className={`flex-shrink-0 border-t border-[var(--border)] px-5 py-4 ${isEmptyState ? "mt-auto" : ""}`}
+          style={{ background: inputBarBg, backdropFilter: "blur(16px)" }}
+        >
           <div className="max-w-3xl mx-auto">
             <div
               className="flex items-end gap-3 glass-strong rounded-2xl px-4 py-3 transition-all duration-200 focus-within:border-[var(--border-primary)]"
