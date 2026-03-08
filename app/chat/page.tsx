@@ -621,7 +621,7 @@ function ChatInner() {
         </header>
 
         {/* Messages */}
-        <div className={`${isEmptyState ? "flex-none sm:flex-1" : "flex-1"} overflow-y-auto`}>
+        <div style={{marginTop: "30px"}} className={`${isEmptyState ? "flex-none sm:flex-1" : "flex-1"} overflow-y-auto`}>
           <div className={`max-w-3xl mx-auto px-4 sm:px-5 py-4 sm:py-6 ${isEmptyState ? "" : "h-full"}`}>
             {isEmptyState && (
               <div className="flex flex-col items-center text-center animate-fade-in pt-5 sm:pt-8 sm:min-h-[50vh] sm:justify-center">
@@ -713,8 +713,9 @@ function ChatInner() {
 
         {/* Input bar */}
         <div
+           
           className={`flex-shrink-0 border-t border-[var(--border)] px-5 py-4 ${isEmptyState ? "mt-auto" : ""}`}
-          style={{ background: inputBarBg, backdropFilter: "blur(16px)" }}
+          style={{ background: inputBarBg, backdropFilter: "blur(16px)",marginBottom: "10px" }}
         >
           <div className="max-w-3xl mx-auto">
             <div
@@ -730,6 +731,7 @@ function ChatInner() {
                 placeholder="Su'aashaada halkan ku qor..."
                 className="flex-1 bg-transparent text-[14px] text-[var(--text)] placeholder:text-[var(--text-muted)] resize-none min-h-[24px] max-h-[120px] leading-relaxed"
                 disabled={loading}
+             
               />
               <button
                 onClick={() => send(input)}
@@ -740,7 +742,7 @@ function ChatInner() {
               </button>
             </div>
             <p className="text-[10px] text-[var(--text-muted)] mt-2 text-center">
-              Fatwa Agent waa kaaliye — culimo weydii xukun sharci ah.
+              Fatwa Agent waa caawiye — culimada deegaankaaga waydii xukunkii khaas ah.
             </p>
           </div>
         </div>
