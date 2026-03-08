@@ -484,6 +484,7 @@ function ChatInner() {
     theme === "system" ? (systemPrefersDark ? "dark" : "light") : theme;
   const chatThemeVars = CHAT_THEME_VARS[resolvedTheme] as Record<string, string>;
   const logoSrc = resolvedTheme === "light" ? "/assets/logo-color.png" : "/assets/logo-white.png";
+  const isEmptyState = msgs.length === 0 && !loading;
 
   const topBarBg = resolvedTheme === "dark" ? "rgba(5,8,15,0.85)" : "rgba(255,255,255,0.9)";
   const inputBarBg = resolvedTheme === "dark" ? "rgba(5,8,15,0.9)" : "rgba(255,255,255,0.92)";
@@ -620,9 +621,9 @@ function ChatInner() {
         </header>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="max-w-3xl mx-auto px-4 sm:px-5 py-4 sm:py-6 h-full">
-            {msgs.length === 0 && !loading && (
+        <div className={`${isEmptyState ? "flex-none sm:flex-1" : "flex-1"} overflow-y-auto`}>
+          <div className={`max-w-3xl mx-auto px-4 sm:px-5 py-4 sm:py-6 ${isEmptyState ? "" : "h-full"}`}>
+            {isEmptyState && (
               <div className="flex flex-col items-center text-center animate-fade-in pt-1 sm:pt-8 sm:min-h-[50vh] sm:justify-center">
                 <div className="w-full">
                   <Image
