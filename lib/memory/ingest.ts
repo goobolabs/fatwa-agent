@@ -7,16 +7,20 @@
 
 import * as fs from "fs";
 import * as path from "path";
+import { embedTextWithFailover, getGeminiApiKeys } from "@/lib/ai/gemini";
 
-// Load .env.local so GEMINI_API_KEY is available when run via npm run ingest
-const envPath = path.resolve(process.cwd(), ".env.local");
-if (fs.existsSync(envPath)) {
+function loadEnvFile(fileName: string): void {
+  const envPath = path.resolve(process.cwd(), fileName);
+  if (!fs.existsSync(envPath)) return;
   const content = fs.readFileSync(envPath, "utf-8");
   for (const line of content.split("\n")) {
     const m = line.match(/^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/);
     if (m) process.env[m[1].trim()] = m[2].trim().replace(/^["']|["']$/g, "");
   }
 }
+// Load local env files for direct script execution.
+loadEnvFile(".env");
+loadEnvFile(".env.local");
 
 const DATA_PATH = path.resolve(process.cwd(), "data/suaalaha_soonka.json");
 const INDEX_PATH = path.resolve(process.cwd(), "data/fatwa_index.json");
@@ -33,32 +37,14 @@ interface IndexedFatwa extends FatwaRecord {
   vector: number[];
 }
 
-const GEMINI_EMBED_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent";
-
-async function embed(text: string, apiKey: string): Promise<number[]> {
-  const res = await fetch(`${GEMINI_EMBED_URL}?key=${apiKey}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      content: { parts: [{ text }] },
-      taskType: "RETRIEVAL_DOCUMENT",
-    }),
-  });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Gemini embed failed: ${res.status} ${err}`);
-  }
-  const data = (await res.json()) as { embedding?: { values?: number[] } };
-  const values = data.embedding?.values;
-  if (!values || !Array.isArray(values)) throw new Error("Invalid embed response");
-  return values;
+async function embed(text: string): Promise<number[]> {
+  return embedTextWithFailover(text, "RETRIEVAL_DOCUMENT");
 }
 
 async function main() {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    console.error("GEMINI_API_KEY is not set.");
+  const keys = getGeminiApiKeys();
+  if (keys.length === 0) {
+    console.error("No Gemini keys found. Set GEMINI_API_KEYS or GEMINI_API_KEY.");
     process.exit(1);
   }
 
@@ -76,7 +62,7 @@ async function main() {
     const f = fatwas[i];
     const text = `Su'aal: ${f.question}\nJawaab: ${f.answer}`;
     try {
-      const vector = await embed(text, apiKey);
+      const vector = await embed(text);
       indexed.push({
         id: f.id,
         sheikh: f.sheikh,

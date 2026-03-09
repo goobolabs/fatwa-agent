@@ -9,15 +9,21 @@ cd /home/omartood/Desktop/AI-agents-project/fatwa-agent
 npm install
 ```
 
-## Step 2: Add Your Gemini API Key
+## Step 2: Add Your Gemini API Key(s)
 
 Edit `.env.local` and replace the placeholder:
 
 ```bash
-GEMINI_API_KEY=your_actual_key_here
+# Recommended: multiple keys with automatic failover
+GEMINI_API_KEYS=key1,key2,key3,key4,key5,key6,key7
+
+# Backward compatible: single key or comma-separated list
+GEMINI_API_KEY=key1
 ```
 
 Get your key from: https://aistudio.google.com/app/apikey
+
+The app will automatically switch to the next key when one key hits rate/quota limits.
 
 ## Step 3: Ingest the Fatwa Data
 
@@ -36,6 +42,17 @@ npm run dev
 ```
 
 Open: http://localhost:3000
+
+## Step 5: Vercel Environment Variables
+
+In Vercel project settings, add:
+
+```bash
+GEMINI_API_KEYS=key1,key2,key3,key4,key5,key6,key7
+GEMINI_MODEL=gemini-2.5-flash-lite
+```
+
+Add the same variables for Production, Preview, and Development environments, then redeploy.
 
 ---
 

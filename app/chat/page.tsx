@@ -89,13 +89,44 @@ const QUICK = [
   
 ];
 
-/** Extract YouTube video ID from youtu.be/... or youtube.com/watch?v=... */
+function cleanUrl(raw: string): string {
+  let value = raw.trim();
+  const secondHttp = value.slice(8).search(/https?:\/\//i);
+  if (secondHttp >= 0) {
+    value = value.slice(0, secondHttp + 8);
+  }
+  return value.replace(/[),.;]+$/, "");
+}
+
+/** Extract YouTube video ID from youtu.be, watch, live, shorts, embed formats. */
 function getYouTubeId(url: string): string | null {
-  const short = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
-  if (short) return short[1];
-  const long = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
-  if (long) return long[1];
-  return null;
+  try {
+    const cleaned = cleanUrl(url);
+    const parsed = new URL(cleaned);
+    const host = parsed.hostname.toLowerCase().replace(/^www\./, "");
+    const parts = parsed.pathname.split("/").filter(Boolean);
+
+    if (host === "youtu.be") {
+      const id = parts[0] ?? "";
+      return /^[a-zA-Z0-9_-]{11}$/.test(id) ? id : null;
+    }
+
+    if (!host.endsWith("youtube.com")) return null;
+
+    const v = parsed.searchParams.get("v");
+    if (v && /^[a-zA-Z0-9_-]{11}$/.test(v)) return v;
+
+    // Support /live/{id}, /shorts/{id}, /embed/{id}
+    const markerIdx = parts.findIndex((p) => p === "live" || p === "shorts" || p === "embed");
+    if (markerIdx >= 0) {
+      const id = parts[markerIdx + 1] ?? "";
+      return /^[a-zA-Z0-9_-]{11}$/.test(id) ? id : null;
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 function parseTimeToSeconds(time: string): number | null {
@@ -114,8 +145,11 @@ function parseTimeToSeconds(time: string): number | null {
 
 function getYouTubeStartSeconds(url: string): number | null {
   try {
-    const parsed = new URL(url);
-    const value = parsed.searchParams.get("t") ?? parsed.searchParams.get("start");
+    const parsed = new URL(cleanUrl(url));
+    const value =
+      parsed.searchParams.get("t") ??
+      parsed.searchParams.get("start") ??
+      parsed.hash.replace(/^#(?:t=)?/, "");
     if (!value) return null;
     return parseTimeToSeconds(value);
   } catch {
@@ -159,7 +193,7 @@ function parseTixraac(raw: string): {
   telegramEmbedUrl: string | null;
 } {
   const urlMatch = raw.match(/(https?:\/\/[^\s]+)/);
-  const url = urlMatch ? urlMatch[1] : null;
+  const url = urlMatch ? cleanUrl(urlMatch[1]) : null;
   const label = raw.replace(urlMatch?.[0] ?? "", "").replace(/[-–—|]+$/, "").trim() || "Tixraac";
   const youtubeId = url ? getYouTubeId(url) : null;
   const startSeconds = url ? getYouTubeStartSeconds(url) : null;

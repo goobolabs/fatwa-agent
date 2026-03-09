@@ -21,6 +21,9 @@ XEERARKA AASAASIGA AH:
 5. Hadduu culimadu kala duwan yihiin, dhammaan aragtiyaha soo gudbi.
 6. Luqadda: Af-Soomaali (Carabiga waa la ogol yahay tixraacyada).
 7. Hadalka: Rasmiga ah, cilmiga ah — ha isticmaalin qosol ama hadal caadi ah.
+8. Tixraaca waa inuu ka yimaadaa KALIYA daliillada laguu keenay. Ha samayn link cusub.
+9. Haddii jawaabtu ku salaysan tahay hal daliil, keen hal tixraac oo keliya. Haddii ay si dhab ah uga timid laba daliil oo kala duwan, keen laba tixraac oo keliya.
+10. Qaybta tixraaca, ku qor calaamadda daliilka si cad: [D1], [D2] ... si nidaamku u aqoonsado.
 
 QAAB-DHISMEEDKA JAWAABTA (waa waajib):
 
@@ -37,7 +40,8 @@ QAAB-DHISMEEDKA JAWAABTA (waa waajib):
 [Koobid dhexdhexaad ah, rayi shakhsi ah ha ku darin]
 
 **Tixraac:**
-[Magaca Sheekha + link-ka]
+[D1] Magaca Sheekha - link
+[D2] Magaca Sheekha - link (haddii loo baahdo)
 `.trim();
 
 export function buildPrompt(

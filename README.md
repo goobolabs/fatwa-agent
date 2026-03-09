@@ -20,7 +20,7 @@ An AI assistant for **Ramadan Fiqh** questions, powered by Somali scholars’ fa
 ## Prerequisites
 
 - **Node.js** 18+ (or Bun)
-- **Google AI API key** — [Create one](https://aistudio.google.com/apikey) and set it as `GEMINI_API_KEY`
+- **Google AI API key(s)** — [Create keys](https://aistudio.google.com/apikey) and set `GEMINI_API_KEYS` (recommended) or `GEMINI_API_KEY`
 
 ## Setup
 
@@ -37,7 +37,11 @@ An AI assistant for **Ramadan Fiqh** questions, powered by Somali scholars’ fa
    Create `.env.local` in the project root:
 
    ```env
-   GEMINI_API_KEY=your_gemini_api_key_here
+   # Recommended (automatic failover / rotation list)
+   GEMINI_API_KEYS=key1,key2,key3,key4,key5,key6,key7
+
+   # Backward compatible (single key OR comma-separated list also works)
+   GEMINI_API_KEY=key1
    ```
 
    Optional:
@@ -81,6 +85,37 @@ An AI assistant for **Ramadan Fiqh** questions, powered by Somali scholars’ fa
 | `npm run start`| Run production server                |
 | `npm run ingest`| Build `data/fatwa_index.json` from `data/suaalaha_soonka.json` |
 | `npm run lint` | Run Next.js ESLint                   |
+
+## Gemini Key Failover
+
+- The app now automatically tries the next Gemini key when a key is rate-limited or quota-limited.
+- Failover is applied to:
+  - answer generation (`/api/ask`)
+  - query embeddings (`lib/memory/search.ts`)
+  - ingestion embeddings (`npm run ingest`)
+- If all keys fail, the request returns the final error.
+
+## Vercel Environment Variables
+
+Set this in Vercel project settings (`Settings -> Environment Variables`) for each target environment (Production / Preview / Development):
+
+```env
+GEMINI_API_KEYS=key1,key2,key3,key4,key5,key6,key7
+GEMINI_MODEL=gemini-2.5-flash-lite
+```
+
+Optional Vercel CLI flow:
+
+```bash
+vercel env add GEMINI_API_KEYS production
+vercel env add GEMINI_API_KEYS preview
+vercel env add GEMINI_API_KEYS development
+vercel env add GEMINI_MODEL production
+vercel env add GEMINI_MODEL preview
+vercel env add GEMINI_MODEL development
+```
+
+Then redeploy so new env values are applied.
 
 ## How It Works
 

@@ -5,6 +5,7 @@
 
 import * as fs from "fs";
 import * as path from "path";
+import { embedTextWithFailover } from "@/lib/ai/gemini";
 
 export interface FatwaEvidence {
   id: number;
@@ -25,8 +26,6 @@ interface IndexedFatwa {
 }
 
 const INDEX_PATH = path.resolve(process.cwd(), "data/fatwa_index.json");
-const GEMINI_EMBED_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent";
 
 function cosineSimilarity(a: number[], b: number[]): number {
   let dot = 0,
@@ -41,20 +40,8 @@ function cosineSimilarity(a: number[], b: number[]): number {
   return denom ? dot / denom : 0;
 }
 
-async function embedQuery(question: string, apiKey: string): Promise<number[]> {
-  const res = await fetch(`${GEMINI_EMBED_URL}?key=${apiKey}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      content: { parts: [{ text: question }] },
-      taskType: "RETRIEVAL_QUERY",
-    }),
-  });
-  if (!res.ok) throw new Error(`Embed failed: ${res.status}`);
-  const data = (await res.json()) as { embedding?: { values?: number[] } };
-  const values = data.embedding?.values;
-  if (!values || !Array.isArray(values)) throw new Error("Invalid embed response");
-  return values;
+async function embedQuery(question: string): Promise<number[]> {
+  return embedTextWithFailover(question, "RETRIEVAL_QUERY");
 }
 
 function loadIndex(): IndexedFatwa[] {
@@ -68,11 +55,8 @@ export async function searchFatwas(
   question: string,
   topK: number = 6
 ): Promise<FatwaEvidence[]> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new Error("GEMINI_API_KEY not set");
-
   const index = loadIndex();
-  const queryVec = await embedQuery(question, apiKey);
+  const queryVec = await embedQuery(question);
 
   const scored = index.map((f) => ({
     ...f,

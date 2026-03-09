@@ -16,7 +16,7 @@ import { detectDomain } from "@/lib/domain/detect";
 import { searchFatwas } from "@/lib/memory/search";
 import { buildPrompt } from "@/lib/ai/prompt";
 import { formatFatwaResponse } from "@/lib/ai/formatter";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { generateTextWithFailover } from "@/lib/ai/gemini";
 
 function extractFirstUrl(text: string): string | null {
   const match = text.match(/https?:\/\/[^\s)]+/i);
@@ -30,37 +30,75 @@ function normalizeRefLine(line: string): string {
     .trim();
 }
 
-function buildEvidenceReferences(
-  evidence: { sheikh: string; source_url: string }[]
+function getEvidenceUrlToIndexMap(
+  evidence: { source_url: string }[]
+): Map<string, number> {
+  const map = new Map<string, number>();
+  for (let i = 0; i < evidence.length; i++) {
+    const url = extractFirstUrl(evidence[i].source_url ?? "");
+    if (url) map.set(url, i);
+  }
+  return map;
+}
+
+function extractIndexFromRefLine(line: string): number | null {
+  const cleaned = normalizeRefLine(line);
+  if (!cleaned) return null;
+  const match = cleaned.match(/\[\s*D\s*(\d+)\s*\]/i) ?? cleaned.match(/\bD\s*(\d+)\b/i);
+  if (!match) return null;
+  const parsed = Number.parseInt(match[1], 10);
+  if (!Number.isFinite(parsed)) return null;
+  return parsed - 1;
+}
+
+function getSelectedEvidenceIndexes(
+  modelRefs: string[],
+  evidence: { source_url: string }[]
+): number[] {
+  const picked: number[] = [];
+  const seen = new Set<number>();
+
+  for (const line of modelRefs) {
+    const idx = extractIndexFromRefLine(line);
+    if (idx === null || idx < 0 || idx >= evidence.length || seen.has(idx)) continue;
+    seen.add(idx);
+    picked.push(idx);
+  }
+
+  if (picked.length > 0) return picked;
+
+  // Fallback: if model did not provide [D#], match only URLs that exist in evidence.
+  const urlToIndex = getEvidenceUrlToIndexMap(evidence);
+  for (const line of modelRefs) {
+    const url = extractFirstUrl(line);
+    if (!url) continue;
+    const idx = urlToIndex.get(url);
+    if (idx === undefined || seen.has(idx)) continue;
+    seen.add(idx);
+    picked.push(idx);
+  }
+
+  return picked;
+}
+
+function buildEvidenceReferencesByIndex(
+  evidence: { sheikh: string; source_url: string }[],
+  selectedIndexes: number[]
 ): string[] {
   const refs: string[] = [];
   const seenUrls = new Set<string>();
 
-  for (const e of evidence) {
-    const url = extractFirstUrl(e.source_url ?? "");
+  for (const idx of selectedIndexes) {
+    const item = evidence[idx];
+    if (!item) continue;
+    const url = extractFirstUrl(item.source_url ?? "");
     if (!url || seenUrls.has(url)) continue;
     seenUrls.add(url);
-    const label = e.sheikh?.trim() ? `Sheekh: ${e.sheikh.trim()}` : "Tixraac";
+    const label = item.sheikh?.trim() ? `Sheekh: ${item.sheikh.trim()}` : "Tixraac";
     refs.push(`${label} - ${url}`);
   }
 
   return refs;
-}
-
-function mergeReferences(modelRefs: string[], evidenceRefs: string[]): string[] {
-  const merged: string[] = [];
-  const seenUrls = new Set<string>();
-
-  for (const line of [...modelRefs, ...evidenceRefs]) {
-    const cleaned = normalizeRefLine(line);
-    if (!cleaned) continue;
-    const url = extractFirstUrl(cleaned);
-    if (!url || seenUrls.has(url)) continue;
-    seenUrls.add(url);
-    merged.push(cleaned);
-  }
-
-  return merged;
 }
 
 export async function POST(req: NextRequest) {
@@ -115,30 +153,16 @@ export async function POST(req: NextRequest) {
     const prompt = buildPrompt(question, evidence);
 
     // Step 5: Call Gemini
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "API key la'aan. Server-ka waa in la hagaajiyo." },
-        { status: 500 }
-      );
-    }
-
-    const genAI = new GoogleGenerativeAI(apiKey);
     // Use model from env (confirmed available via ListModels)
     const modelId = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
-    const model = genAI.getGenerativeModel({
-      model: modelId,
+    const rawText = await generateTextWithFailover({
+      prompt,
+      modelId,
       generationConfig: {
         temperature: 0.1,
         maxOutputTokens: 2048,
       },
     });
-
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    if (!response) throw new Error("Gemini returned no response");
-    const rawText = response.text();
-    if (!rawText.trim()) throw new Error("Gemini returned empty text");
 
     // Step 6: Format and return
     const formatted = formatFatwaResponse(rawText);
@@ -146,8 +170,12 @@ export async function POST(req: NextRequest) {
     const modelTixraacList = formatted.tixraac
       ? formatted.tixraac.split("\n").map((t) => t.trim()).filter(Boolean)
       : [];
-    const evidenceTixraacList = buildEvidenceReferences(evidence);
-    const tixraacList = mergeReferences(modelTixraacList, evidenceTixraacList);
+    const selectedEvidenceIndexes = getSelectedEvidenceIndexes(modelTixraacList, evidence);
+    const boundedIndexes =
+      selectedEvidenceIndexes.length > 0
+        ? selectedEvidenceIndexes.slice(0, 2)
+        : [0];
+    const tixraacList = buildEvidenceReferencesByIndex(evidence, boundedIndexes);
 
     return NextResponse.json({
       success: true,
